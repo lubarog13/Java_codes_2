@@ -9,11 +9,11 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.sql.SQLException;
 import java.util.List;
 
 public class Entity implements Externalizable {
-     private static int idCounter = 1;
- final long id;//приравнивается idCounter, после чего idCounter увеличивается на 1
+protected int id;    //приравнивается idCounter, после чего idCounter увеличивается на 1
 protected String title;
 protected double posX;
 protected double posZ;
@@ -40,10 +40,8 @@ protected boolean alive = true;
     public void setTarget(Entity target) {
         this.target = target;
     }
-
-    public Entity(String title, double posX, double posZ, boolean agressive, int maxHealth, int health, int attackDamage) {
-        this.id = idCounter;
-        idCounter++;
+    public Entity(){}
+    public Entity(String title, double posX, double posZ, boolean agressive, int maxHealth, int health, int attackDamage) throws SQLException {
         this.title = title;
         this.posX = posX;
         this.posZ = posZ;
@@ -51,9 +49,17 @@ protected boolean alive = true;
         this.maxHealth = maxHealth;
         this.health = health;
         this.attackDamage = attackDamage;
+        this.id= DatabaseUtils.insert_new_entity(this);
     }
-    public Entity(){
-        id = idCounter++;
+    public Entity(int id, String title, double posX, double posZ, boolean agressive, int maxHealth, int health, int attackDamage) {
+        this.id = id;
+        this.title = title;
+        this.posX = posX;
+        this.posZ = posZ;
+        this.agressive = agressive;
+        this.maxHealth = maxHealth;
+        this.health = health;
+        this.attackDamage = attackDamage;
     }
     public void searchTarget(){
         List <Entity> searchEntities= GameServer.getInstance().getServerWorld().getEntitiesNearEntity(this, 20);
@@ -75,7 +81,7 @@ protected boolean alive = true;
         range =  Math.sqrt(Math.pow(posX - x, 2) + Math.pow(posZ - y, 2));
     }
 
-    public void update(){
+    public void update() throws SQLException {
         if (agressive){
             if(target==null || !target.isAlive()){
                 searchTarget();
@@ -92,18 +98,28 @@ protected boolean alive = true;
 
         }
     }
-    public void attack(Entity entity){
+    public void attack(Entity entity) throws SQLException {
             entity.health-=attackDamage;
             if (entity.health<0){
                 entity.setAlive(false);
                 target = null;
                 System.out.println(this.title + " убил " + entity.getTitle());
+                if (this instanceof EntityPlayer){
+                    ((EntityPlayer) this).setExtraXp(GameServer.getInstance().getGameConfig().getDifficulty()*entity.getMaxHealth());
+                    DatabaseUtils.update_player((EntityPlayer) this);
+                }
+                DatabaseUtils.insert_battle_log(this, entity);
+                DatabaseUtils.update_entity(entity);
             }
             if (entity instanceof EntityPlayer) {
                 health -= entity.attackDamage + 0.5 * GameServer.getInstance().getGameConfig().getDifficulty();
                 if (health<0){
                     alive = false;
+                    ((EntityPlayer) entity).setExtraXp(GameServer.getInstance().getGameConfig().getDifficulty()*this.getMaxHealth());
                     System.out.println(entity.getTitle() + " убил " + this.title);
+                    DatabaseUtils.insert_battle_log(entity, this);
+                    DatabaseUtils.update_entity(this);
+                    DatabaseUtils.update_player((EntityPlayer) entity);
                 }
             }
 
@@ -123,15 +139,7 @@ protected boolean alive = true;
                 '}';
     }
 
-    public static int getIdCounter() {
-        return idCounter;
-    }
-
-    public static void setIdCounter(int idCounter) {
-        Entity.idCounter = idCounter;
-    }
-
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -193,6 +201,7 @@ protected boolean alive = true;
 
     @Override
     public void writeExternal(ObjectOutput output) throws IOException {
+        output.writeInt(id);
         output.writeUTF(title);
         output.writeDouble(posX);
         output.writeDouble(posZ);
@@ -205,6 +214,7 @@ protected boolean alive = true;
 
     @Override
     public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
+        id = input.readInt();
         title = input.readUTF();
         posX = input.readDouble();
         posZ = input.readDouble();

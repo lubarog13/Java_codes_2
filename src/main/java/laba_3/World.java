@@ -7,6 +7,7 @@ import com.esotericsoftware.kryo.io.Output;
 
 import java.io.Externalizable;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.*;
 
 public class World implements Serializable {
@@ -28,7 +29,7 @@ public class World implements Serializable {
                 ", entities=" + entities +
                 '}';
     }
-    public void update(){
+    public void update() throws SQLException {
         for( Entity entity : entities) {
             entity.update();
         }

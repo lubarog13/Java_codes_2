@@ -2,6 +2,7 @@ package laba_3;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -24,7 +25,11 @@ public class GameServer {
         for ( int i = 0; i < 30; i++ ) {
             System.out.println(instance);
             updater++;
-            this.serverWorld.update();
+            try {
+                this.serverWorld.update();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
             if(updater%(gameConfig.getSavePeriod())==0){
                 try {
                     FileUtils.saveWorld(new File("world.dat"), serverWorld);
@@ -51,6 +56,7 @@ public class GameServer {
         this.serverWorld = FileUtils.loadWorld(new File("world.dat"));
         if(serverWorld == null){
             Entity[] entities = new Entity[7];
+            try {
             entities[0]= new Entity("Dragon", 20, 15, true, 50, 50, 20);
             entities[1]=new Entity("Wolf", 40, 50, true, 30, 30, 10);
             entities[2] = new EntityPlayer("Me", 30, 25,50, 45, 20, "hello");
@@ -60,6 +66,10 @@ public class GameServer {
             entities[6] = new EntityPlayer("Anouther", 20, 20,50, 40, 25, "cool");
             this.serverWorld = new World(1, "Hello, world", new ArrayList<>(Arrays.asList(entities)));
             FileUtils.saveWorld(new File("world.dat"), serverWorld);}
+            catch (SQLException e){
+                e.printStackTrace();
+            }
+            }
     }
     @Override
     public String toString() {
