@@ -42,6 +42,7 @@ public class EntityPlayer extends Entity implements Externalizable {
         }
         if (GameServer.getInstance().getUpdater()%5==0){
             xp+=10*GameServer.getInstance().getGameConfig().getDifficulty();
+            DatabaseUtils.update_player(this);
         }
     }
 
