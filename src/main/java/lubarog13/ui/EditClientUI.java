@@ -12,8 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
-public class ClientUI extends BaseSubUI<MainUI> {
+public class EditClientUI extends BaseSubUI<MainUI> {
     private JTextField textFieldFName;
     private JTextField textFieldLName;
     private JTextField textFieldPatronymic;
@@ -30,11 +31,16 @@ public class ClientUI extends BaseSubUI<MainUI> {
     private JComboBox<Integer> dayRegBox;
     private JComboBox<String> monthRegBox;
     private JComboBox<Integer> yearRegBox;
+    private JTextField textFieldID;
+    private JButton deleteButton;
+    private Client client;
 
-    public ClientUI(MainUI mainUI) {
+    public EditClientUI(Client client, MainUI mainUI) {
         super(mainUI, 600, 500);
         setContentPane(mainPanel);
+        this.client = client;
         initBoxes();
+        initValues();
         saveButton.addActionListener(l -> {
             String first_name = textFieldFName.getText();
             String last_name = textFieldLName.getText();
@@ -80,16 +86,19 @@ public class ClientUI extends BaseSubUI<MainUI> {
 
             String photoPath = textFieldPhoto.getText();
             try {
-                ClientManager1.insertClient(new Client(0, first_name, last_name, patronymic, b_date, r_date, email, phone, gender, photoPath));
-                closeSubUI();
+                ClientManager1.updateClient(new Client(client.getId(), first_name, last_name, patronymic, b_date, r_date, email, phone, gender, photoPath));
             } catch (SQLException e) {
+                DialogUtil.showError(this, "Ошибка сохранения данных " + e.getMessage());
                 e.printStackTrace();
+                return;
             }
+            DialogUtil.showInfo(this, "Книга обновлена успешно");
+            closeSubUI();
         });
         backButton.addActionListener(e -> closeSubUI());
+        deleteButton.addActionListener(e -> deleteAction());
         setVisible(true);
     }
-
 
     private void initBoxes() {
         for(int i=1; i<=31; i++) {
@@ -101,6 +110,41 @@ public class ClientUI extends BaseSubUI<MainUI> {
             yearRegBox.addItem(i);
         }
 
+    }
+
+    private void initValues() {
+        textFieldID.setEditable(false);
+        textFieldID.setText(String.valueOf(client.getId()));
+        textFieldFName.setText(client.getFirstName());
+        textFieldLName.setText(client.getLastName());
+        textFieldPatronymic.setText(client.getPatronymic());
+        textFieldEmail.setText(client.getEmail());
+        textFieldPhone.setText(client.getPhone());
+        textFieldGender.setText(client.getGenderCode().toUpperCase(Locale.ROOT));
+        textFieldPhoto.setText(client.getPhotoPath());
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(client.getBirthday());
+        dayBox.setSelectedItem(calendar.get(Calendar.DAY_OF_MONTH));
+        monthBox.setSelectedIndex(calendar.get(Calendar.MONTH));
+        yearBox.setSelectedItem(calendar.get(Calendar.YEAR));
+        calendar.setTime(client.getRegistrationDate());
+        dayRegBox.setSelectedItem(calendar.get(Calendar.DAY_OF_MONTH));
+        monthRegBox.setSelectedIndex(calendar.get(Calendar.MONTH));
+        yearRegBox.setSelectedItem(calendar.get(Calendar.YEAR));
+    }
+
+    private void deleteAction() {
+        if(JOptionPane.showConfirmDialog(this, "Вы точно хотите удалить данного клиента?", "Подтверждение", JOptionPane.YES_NO_OPTION)
+                == JOptionPane.YES_OPTION) {
+            try {
+                ClientManager1.deleteClient(client.getId());
+                DialogUtil.showInfo(this, "Клиент успешно удален");
+                closeSubUI();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                DialogUtil.showError(this, "Ошибка удаленния данных");
+            }
+        }
     }
 
 }

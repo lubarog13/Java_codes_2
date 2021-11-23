@@ -56,4 +56,57 @@ public class ClientManager1 {
         }
     }
 
+
+    public static Client getClientById(int id) throws SQLException {
+        try(Connection c = MySqlConnection.getConnection()) {
+            String sql = "select * from Client where id=?";
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet resultSet = ps.executeQuery();
+            if(resultSet.next()) {
+                return new Client(
+                        resultSet.getInt("id"),
+                        resultSet.getString("FirstName"),
+                        resultSet.getString("LastName"),
+                        resultSet.getString("Patronymic"),
+                        resultSet.getTimestamp("Birthday"),
+                        resultSet.getTimestamp("RegistrationDate"),
+                        resultSet.getString("Email"),
+                        resultSet.getString("Phone"),
+                        resultSet.getString("GenderCode"),
+                        resultSet.getString("PhotoPath")
+                );
+            }
+            return null;
+        }
+    }
+
+    public static void updateClient(Client client) throws SQLException {
+        try(Connection c = MySqlConnection.getConnection()) {
+            String sql = "update Client set FirstName=?, LastName=?, Patronymic=?, Birthday=?, RegistrationDate=?, Email=?, Phone=?, GenderCode=?, PhotoPath=? where id=?";
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, client.getFirstName());
+            ps.setString(2, client.getLastName());
+            ps.setString(3, client.getPatronymic());
+            ps.setTimestamp(4, new Timestamp(client.getBirthday().getTime()));
+            ps.setTimestamp(5, new Timestamp(client.getRegistrationDate().getTime()));
+            ps.setString(6, client.getEmail());
+            ps.setString(7, client.getPhone());
+            ps.setString(8, client.getGenderCode());
+            ps.setString(9, client.getPhotoPath());
+            ps.setInt(10, client.getId());
+            ps.executeUpdate();
+        }
+    }
+
+
+    public static void deleteClient(int id) throws SQLException {
+        try(Connection c = MySqlConnection.getConnection()) {
+            String sql = "delete from Client where id=?";
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+    }
+
 }
