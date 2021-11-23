@@ -14,12 +14,12 @@ public class ClientManager {
     {
         try(Connection c = ClientConnection.getConnection())
         {
-            String sql = """
-            SELECT ClientService.id, service.title, service.cost, client.firstname,  client.lastname, 
-            client.patronymic, ClientService.StartTime
-            FROM ClientService join client on Client.id = ClientID 
-            join Service on Service.id=ServiceID
-            """;
+          String sql = "";
+//            SELECT ClientService.id, service.title, service.cost, client.firstname,  client.lastname,
+//            client.patronymic, ClientService.StartTime
+//            FROM ClientService join client on Client.id = ClientID
+//            join Service on Service.id=ServiceID
+//            """;
             Statement s = c.createStatement();
             ResultSet resultSet = s.executeQuery(sql);
             while(resultSet.next()) {

@@ -65,9 +65,9 @@ public class MySqlConnection
     public static Connection getConnection() throws SQLException
     {
         return DriverManager.getConnection(
-                "jdbc:mysql://127.0.0.1/urok",
+                "jdbc:mysql://127.0.0.1/products",
                 "root",
-                "1234"
+                "hello123 Somebody"
         );
     }
 }

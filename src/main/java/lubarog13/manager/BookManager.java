@@ -66,22 +66,22 @@ public class BookManager {
                     "PRIMARY KEY(id)" +
                     ")";*/
 
-            String sql = """
-                    CREATE TABLE IF NOT EXISTS books (
-                        id INT(10) NOT NULL AUTO_INCREMENT,
-                        title VARCHAR(128) NOT NULL,
-                        author VARCHAR(128) NOT NULL,
-                        pages INT(5) NOT NULL,
-                        create_date DATETIME NOT NULL,
-                        rating FLOAT(10) NOT NULL,
-                        age_rating INT(10) NOT NULL,
-                        PRIMARY KEY(id)
-                    );
-                    """;
-
-            Statement s = c.createStatement();
-
-            s.executeUpdate(sql);
+//            String sql = """
+//                    CREATE TABLE IF NOT EXISTS books (
+//                        id INT(10) NOT NULL AUTO_INCREMENT,
+//                        title VARCHAR(128) NOT NULL,
+//                        author VARCHAR(128) NOT NULL,
+//                        pages INT(5) NOT NULL,
+//                        create_date DATETIME NOT NULL,
+//                        rating FLOAT(10) NOT NULL,
+//                        age_rating INT(10) NOT NULL,
+//                        PRIMARY KEY(id)
+//                    );
+//                    """;
+//
+//            Statement s = c.createStatement();
+//
+//            s.executeUpdate(sql);
         }
     }
 

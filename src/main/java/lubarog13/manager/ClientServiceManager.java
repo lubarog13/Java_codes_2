@@ -14,11 +14,7 @@ import java.util.List;
 public class ClientServiceManager {
     public static List<Service> selectUserServices(String firstName, String lastName, String patronymic) throws SQLException {
         try(Connection c = MySqlConnection.getConnection()) {
-            String sql = """
-            select service.* from client left join clientservice on 
-            client.ID=ClientID left join service on service.ID=ServiceID where 
-            FirstName=? and LastName=? and Patronymic=?
-            """;
+            String sql = " select Service.* from Client left join ClientService on Client.ID=ClientID left join Service on Service.ID=ServiceID where FirstName=? and LastName=? and Patronymic=? ";
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setString(1, firstName);
             ps.setString(2, lastName);
@@ -34,11 +30,7 @@ public class ClientServiceManager {
                         rs.getDouble("Discount"),
                         rs.getString("MainImagePath")));
             }
-            sql = """
-            select sum(Cost) from client left join clientservice on 
-            client.ID=ClientID left join service on service.ID=ServiceID where 
-            FirstName=? and LastName=? and Patronymic=?
-            """;
+            sql = "select sum(Cost) from Client left join ClientService on Client.ID=ClientID left join Service on Service.ID=ServiceID where FirstName=? and LastName=? and Patronymic=? ";
             ps = c.prepareStatement(sql);
             ps.setString(1, firstName);
             ps.setString(2, lastName);
@@ -54,10 +46,7 @@ public class ClientServiceManager {
 
     public static List<Client> selectClients(String serviceName) throws SQLException {
         try(Connection c = MySqlConnection.getConnection()) {
-            String sql = """
-                    Select client.* from service left join clientservice on service.ID=ServiceID
-                    left join client on client.ID=ClientID where service.Title=?
-                    """;
+            String sql = " Select Client.* from Service left join ClientService on Service.ID=ServiceID left join Client on Client.ID=ClientID where Service.Title=? ";
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setString(1, serviceName);
             ResultSet rs = ps.executeQuery();
