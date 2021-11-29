@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-public class EditClientUI extends BaseSubUI<MainUI> {
+public class EditClientUI extends BaseUI{
     private JTextField textFieldFName;
     private JTextField textFieldLName;
     private JTextField textFieldPatronymic;
@@ -35,8 +35,8 @@ public class EditClientUI extends BaseSubUI<MainUI> {
     private JButton deleteButton;
     private Client client;
 
-    public EditClientUI(Client client, MainUI mainUI) {
-        super(mainUI, 600, 500);
+    public EditClientUI(Client client) {
+        super("My Application", 600, 500);
         setContentPane(mainPanel);
         this.client = client;
         initBoxes();
@@ -92,10 +92,14 @@ public class EditClientUI extends BaseSubUI<MainUI> {
                 e.printStackTrace();
                 return;
             }
-            DialogUtil.showInfo(this, "Книга обновлена успешно");
-            closeSubUI();
+            DialogUtil.showInfo(this, "Клиент обновлен успешно");
+            dispose();
+            new ClientTableUI();
         });
-        backButton.addActionListener(e -> closeSubUI());
+        backButton.addActionListener(e -> {
+            dispose();
+            new ClientTableUI();
+        });
         deleteButton.addActionListener(e -> deleteAction());
         setVisible(true);
     }
@@ -139,7 +143,8 @@ public class EditClientUI extends BaseSubUI<MainUI> {
             try {
                 ClientManager1.deleteClient(client.getId());
                 DialogUtil.showInfo(this, "Клиент успешно удален");
-                closeSubUI();
+                dispose();
+                new ClientTableUI();
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 DialogUtil.showError(this, "Ошибка удаленния данных");

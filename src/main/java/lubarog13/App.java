@@ -7,6 +7,7 @@ import lubarog13.manager.ClientServiceManager;
 import lubarog13.manager.HumanManager;
 import lubarog13.manager.ProductManager;
 import lubarog13.ui.AllClientUI;
+import lubarog13.ui.ClientTableUI;
 import lubarog13.ui.ClientUI;
 import lubarog13.ui.MainUI;
 
@@ -28,7 +29,7 @@ public class App {
             e.printStackTrace();
         }
 
-        new MainUI();
+        new ClientTableUI();
 
     }
 }

@@ -13,7 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class ClientUI extends BaseSubUI<MainUI> {
+public class ClientUI extends BaseUI {
     private JTextField textFieldFName;
     private JTextField textFieldLName;
     private JTextField textFieldPatronymic;
@@ -31,8 +31,8 @@ public class ClientUI extends BaseSubUI<MainUI> {
     private JComboBox<String> monthRegBox;
     private JComboBox<Integer> yearRegBox;
 
-    public ClientUI(MainUI mainUI) {
-        super(mainUI, 600, 500);
+    public ClientUI() {
+        super("My application", 600, 500);
         setContentPane(mainPanel);
         initBoxes();
         saveButton.addActionListener(l -> {
@@ -81,12 +81,16 @@ public class ClientUI extends BaseSubUI<MainUI> {
             String photoPath = textFieldPhoto.getText();
             try {
                 ClientManager1.insertClient(new Client(0, first_name, last_name, patronymic, b_date, r_date, email, phone, gender, photoPath));
-                closeSubUI();
+                dispose();
+                new ClientTableUI();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         });
-        backButton.addActionListener(e -> closeSubUI());
+        backButton.addActionListener(e -> {
+            dispose();
+            new ClientTableUI();
+        });
         setVisible(true);
     }
 

@@ -28,7 +28,7 @@ public class MainUI extends BaseUI {
     }
 
     private void createClient() {
-        new ClientUI(this);
+        new ClientUI();
     }
 
     private void editClient() {
@@ -51,7 +51,7 @@ public class MainUI extends BaseUI {
             DialogUtil.showError(this, "Клиента с таким id не существует");
             return;
         }
-        new EditClientUI(client, this);
+        new EditClientUI(client);
 
     }
 }
