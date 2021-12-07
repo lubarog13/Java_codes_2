@@ -1,5 +1,7 @@
 package lubarog13.Entetys;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.util.Date;
 import java.util.Objects;
 
@@ -12,6 +14,7 @@ public class Book
     private Date createDate;
     private double rating;
     private int ageRating;
+    private ImageIcon image;
 
     public Book( int id, String title, String author, int pages, Date createDate, double rating, int ageRating) {
         this.id = -1;

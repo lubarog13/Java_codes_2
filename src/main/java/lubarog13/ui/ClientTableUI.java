@@ -39,10 +39,11 @@ public class ClientTableUI extends BaseUI {
         try {
             model = new CustomTableModel<>(
                     Client.class,
-                    new String[] {"id", "Имя", "Фамилия", "Отчество", "Дата рождения", "Дата регистрации", "Email", "Телефон", "Пол", "Фотография"},
+                    new String[] {"id", "Имя", "Фамилия", "Отчество", "Дата рождения", "Дата регистрации", "Email", "Телефон", "Пол", "Фотография", "Изображение"},
                     ClientManager1.getClients()
             );
             table.setModel(model);
+            table.setRowHeight(100);
         } catch (SQLException e) {
             e.printStackTrace();
         }

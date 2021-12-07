@@ -17,7 +17,9 @@ import java.util.stream.Collectors;
 
 import static lubarog13.MySqlConnection.getConnection;
 
+
 public class Main {
+
 
     public static void main(String[] args){
        /*Product product = new Product("Moloko", 10, 12.5);
