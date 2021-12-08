@@ -2,6 +2,7 @@ package lubarog13;
 
 import lubarog13.manager.ClientServiceManager;
 import lubarog13.ui.ClientTableUI;
+import lubarog13.ui.MaterialTableForm;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -11,12 +12,12 @@ import java.util.*;
 
 public class App {
     public static void main(String[] args){
-        try {
-            System.out.println(ClientServiceManager.selectUserServices("Варлам","Некрасов","Михайлович"));
-            System.out.println(ClientServiceManager.selectClients("Замена ремня привода ГУР"));
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        //try {
+//            System.out.println(ClientServiceManager.selectUserServices("Варлам","Некрасов","Михайлович"));
+//            System.out.println(ClientServiceManager.selectClients("Замена ремня привода ГУР"));
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -25,7 +26,8 @@ public class App {
 
         changeAllFonts(new FontUIResource("Ubuntu", Font.TRUETYPE_FONT, 12));
 
-        new ClientTableUI();
+       // new ClientTableUI();
+        new MaterialTableForm();
 //        Random random = new Random();
 //        int[] list = new int[10];
 //        for (int i=0; i<10; i++) {
