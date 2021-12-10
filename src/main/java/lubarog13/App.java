@@ -3,6 +3,7 @@ package lubarog13;
 import lubarog13.manager.ClientServiceManager;
 import lubarog13.ui.ClientTableUI;
 import lubarog13.ui.MaterialTableForm;
+import lubarog13.ui.ShopProductTableForm;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -27,7 +28,7 @@ public class App {
         changeAllFonts(new FontUIResource("Ubuntu", Font.TRUETYPE_FONT, 12));
 
        // new ClientTableUI();
-        new MaterialTableForm();
+        new ShopProductTableForm();
 //        Random random = new Random();
 //        int[] list = new int[10];
 //        for (int i=0; i<10; i++) {
