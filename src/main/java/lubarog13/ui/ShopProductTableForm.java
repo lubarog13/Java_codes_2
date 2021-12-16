@@ -4,15 +4,20 @@ import lubarog13.BaseUI;
 import lubarog13.CustomTableModel;
 import lubarog13.Entetys.Product;
 import lubarog13.Entetys.ShopProduct;
+import lubarog13.ExtendedTableModelWithDocs;
 import lubarog13.manager.ShopProductManager;
 import lubarog13.util.DialogUtil;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableModel;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class ShopProductTableForm extends BaseUI {
     private JTable table;
@@ -28,7 +33,7 @@ public class ShopProductTableForm extends BaseUI {
     private JTextField searchField;
     private JButton searchButton;
 
-    CustomTableModel<ShopProduct> model;
+    private ExtendedTableModelWithDocs<ShopProduct> model;
 
     public ShopProductTableForm() {
         super("Products", 1000, 800);
@@ -41,11 +46,16 @@ public class ShopProductTableForm extends BaseUI {
 
     private void initTable() {
         try {
-             model = new CustomTableModel<ShopProduct>(
+            table.getTableHeader().setReorderingAllowed(false);
+             model = new ExtendedTableModelWithDocs<ShopProduct>(
                      ShopProduct.class,
-                     new String[]{"ID", "Название", "Тип", "Артикул", "Описание", "Путь к картинке", "Production Person Count", "Production Workshop Number", "Минимальная стоимость для агента", "Картинка"},
-                     ShopProductManager.getAll()
-             );
+                     new String[]{"ID", "Название", "Тип", "Артикул", "Описание", "Путь к картинке", "Production Person Count", "Production Workshop Number", "Минимальная стоимость для агента", "Картинка"}
+             ) {
+                 @Override
+                 public void onUpdateRowsEvent() {
+                 }
+            };
+             model.setAllRows(ShopProductManager.getAll());
              table.setModel(model);
              table.setRowHeight(100);
              table.addMouseListener(new MouseAdapter() {
@@ -53,7 +63,7 @@ public class ShopProductTableForm extends BaseUI {
                  public void mouseClicked(MouseEvent e) {
                      if(e.getClickCount()==2) {
                          dispose();
-                         new ShopProductUpdateForm((ShopProduct) model.getRows().get(table.rowAtPoint(e.getPoint())));
+                         new ShopProductUpdateForm((ShopProduct) model.getFilteredRows().get(table.rowAtPoint(e.getPoint())));
                      }
                  }
              });
@@ -61,6 +71,34 @@ public class ShopProductTableForm extends BaseUI {
             throwables.printStackTrace();
             return;
         }
+        model.getFilters()[0] = new Predicate<ShopProduct>() {
+            @Override
+            public boolean test(ShopProduct shopProduct) {
+                String searchText = searchField.getText();
+
+                if(searchText == null || searchText.isEmpty()) {
+                    return true;
+                }
+                String s = shopProduct.getTitle() + shopProduct.getProductType() + shopProduct.getArticleNumber();
+                return s.contains(searchText);
+            }
+        };
+        model.getFilters()[1] = new Predicate<ShopProduct>() {
+            @Override
+            public boolean test(ShopProduct shopProduct) {
+                if(titleBox.getSelectedIndex()!=0)
+                return shopProduct.getTitle().startsWith(titleBox.getSelectedItem().toString());
+                return true;
+            }
+        };
+        model.getFilters()[2] = new Predicate<ShopProduct>() {
+            @Override
+            public boolean test(ShopProduct shopProduct) {
+                if (typeBox.getSelectedIndex()!=0)
+                return shopProduct.getProductType().equals(typeBox.getSelectedItem());
+                return true;
+            }
+        };
     }
 
     private void initButtons() {
@@ -69,60 +107,48 @@ public class ShopProductTableForm extends BaseUI {
             new ShopProductCreateForm();
         });
         clearButton.addActionListener(e -> {
-            typeBox.setSelectedIndex(0);
+            searchField.setText("");
             titleBox.setSelectedIndex(0);
+            typeBox.setSelectedIndex(0);
+            model.setSorter(null);
         });
-        idSortButton.addActionListener(e -> {
-            if(!idSort) {
-                model.getRows().sort(new Comparator<ShopProduct>() {
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                model.updateFilteredRows();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                model.updateFilteredRows();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                model.updateFilteredRows();
+            }
+        });
+        idSortButton.addActionListener(e ->
+                model.setSorter(new Comparator<ShopProduct>() {
                     @Override
                     public int compare(ShopProduct o1, ShopProduct o2) {
                         return Integer.compare(o1.getId(), o2.getId());
                     }
-                });
-            }
-            else {
-                model.getRows().sort(new Comparator<ShopProduct>() {
+                })
+        );
+        mincostSortButton.addActionListener(e ->
+                model.setSorter(new Comparator<ShopProduct>() {
                     @Override
                     public int compare(ShopProduct o1, ShopProduct o2) {
-                        return Integer.compare(o2.getId(), o1.getId());
+                        return Double.compare(o1.getMinCostForAgent(), o2.getMinCostForAgent());
                     }
-                });
-            }
-            idSort = !idSort;
-            minCostSort = false;
-            model.fireTableDataChanged();
-        });
-        mincostSortButton.addActionListener(e -> {
-            if(!minCostSort) {
-                model.getRows().sort(Comparator.comparingDouble(ShopProduct::getMinCostForAgent));
-            } else {
-                model.getRows().sort(((o1, o2) -> Double.compare(o2.getMinCostForAgent(), o1.getMinCostForAgent())));
-            }
-            minCostSort=!minCostSort;
-            idSort=false;
-            model.fireTableDataChanged();
-        });
-        searchButton.addActionListener(e -> {
-            try {
-                List<ShopProduct> shopProducts = ShopProductManager.searchProduct(searchField.getText());
-                if(shopProducts.size()==0) {
-                    DialogUtil.showInfo("Ничего не найдено");
-                    setFilters();
-                    return;
-                }
-                model.setRows(shopProducts);
-                model.fireTableDataChanged();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-                DialogUtil.showError("Ошибка работы с базой");
-            }
-        });
+                })
+        );
     }
 
     private void initBoxes() {
         Set<String> types = new HashSet<>();
-        List<ShopProduct> products = model.getRows();
+        List<ShopProduct> products = model.getAllRows();
         for (ShopProduct product: products) {
             types.add(product.getProductType());
         }
@@ -138,23 +164,11 @@ public class ShopProductTableForm extends BaseUI {
         for (String cha: chars){
             titleBox.addItem(cha);
         }
-        titleBox.addItemListener(e -> setFilters());
-        typeBox.addItemListener(e -> setFilters());
-    }
-
-    private void setFilters() {
-        try {
-            List<ShopProduct>shopProducts = ShopProductManager.getAll();
-            if(titleBox.getSelectedIndex()!=0) {
-                shopProducts.removeIf(shopProduct -> !shopProduct.getTitle().startsWith(titleBox.getSelectedItem().toString()));
-            }
-            if(typeBox.getSelectedIndex()!=0){
-               shopProducts.removeIf(shopProduct -> !shopProduct.getProductType().equals(typeBox.getSelectedItem().toString()));
-            }
-            model.setRows(shopProducts);
-            model.fireTableDataChanged();
-        } catch (SQLException throwables) {
-            DialogUtil.showError("Ошибка работы с базой");
-        }
+        titleBox.addItemListener(e -> {
+            if(e.getStateChange()== ItemEvent.SELECTED) model.updateFilteredRows();
+        });
+        typeBox.addItemListener(e -> {
+            if(e.getStateChange()== ItemEvent.SELECTED) model.updateFilteredRows();
+        });
     }
 }
