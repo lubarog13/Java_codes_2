@@ -32,15 +32,15 @@ public class ClientConnection {
         String patronymic = "Романович";
         String title = "Замена свечей";
         String comment = "Как можно скорее";
-        try {
-            System.out.println(ClientManager.insertClientService(firstname, lastname, patronymic, title, comment));
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        try {
-            ClientManager.getAll();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+//        try {
+//            System.out.println(ClientManager.insertClientService(firstname, lastname, patronymic, title, comment));
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
+//        try {
+//            ClientManager.getAll();
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
     }
 }

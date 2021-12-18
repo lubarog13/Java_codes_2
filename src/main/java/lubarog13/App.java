@@ -1,15 +1,10 @@
 package lubarog13;
 
-import lubarog13.manager.ClientServiceManager;
-import lubarog13.ui.ClientTableUI;
-import lubarog13.ui.MaterialTableForm;
-import lubarog13.ui.ServiceTableForm;
-import lubarog13.ui.ShopProductTableForm;
+import lubarog13.ui.*;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.*;
 
 public class App {
@@ -29,7 +24,7 @@ public class App {
         changeAllFonts(new FontUIResource("Ubuntu", Font.TRUETYPE_FONT, 12));
 
        // new ClientTableUI();
-        new ServiceTableForm();
+        new ClientTableForm();
 //        Random random = new Random();
 //        int[] list = new int[10];
 //        for (int i=0; i<10; i++) {

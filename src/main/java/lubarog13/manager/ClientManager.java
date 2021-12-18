@@ -2,6 +2,7 @@ package lubarog13.manager;
 
 import lubarog13.ClientConnection;
 import lubarog13.Entetys.Book;
+import lubarog13.Entetys.Client;
 import lubarog13.MySqlConnection;
 
 import java.sql.*;
@@ -9,51 +10,75 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+//ID, FirstName, LastName, Patronymic, Birthday, RegistrationDate, Email, Phone, GenderCode, PhotoPath
 public class ClientManager {
-    public static void getAll() throws SQLException
-    {
-        try(Connection c = ClientConnection.getConnection())
-        {
-          String sql = "";
-//            SELECT ClientService.id, service.title, service.cost, client.firstname,  client.lastname,
-//            client.patronymic, ClientService.StartTime
-//            FROM ClientService join client on Client.id = ClientID
-//            join Service on Service.id=ServiceID
-//            """;
-            Statement s = c.createStatement();
-            ResultSet resultSet = s.executeQuery(sql);
-            while(resultSet.next()) {
-                System.out.println(resultSet.getInt("ClientService.id") + " "  +
-                        resultSet.getString("service.title") + " "  +resultSet.getBigDecimal("service.cost")
-                        + " "  +resultSet.getString("client.firstname")+ " "  +resultSet.getString("client.lastname")
-                        + " "  +resultSet.getString("client.patronymic") + " "  +resultSet.getTimestamp("ClientService.StartTime"));
-            }
+    public static void createClient(Client client) throws SQLException {
+        try(Connection c = MySqlConnection.getConnection()) {
+            String sql = "insert into Client(FirstName, LastName, Patronymic, Birthday, RegistrationDate, Email, Phone, GenderCode, PhotoPath) values (?,?,?,?,?,?,?,?,?)";
+            PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, client.getFirstName());
+            ps.setString(2, client.getLastName());
+            ps.setString(3, client.getPatronymic());
+            ps.setTimestamp(4, new Timestamp(client.getBirthday().getTime()));
+            ps.setTimestamp(5, new Timestamp(client.getRegistrationDate().getTime()));
+            ps.setString(6, client.getEmail());
+            ps.setString(7, client.getPhone());
+            ps.setString(8, client.getGenderCode());
+            ps.setString(9, client.getPhotoPath());
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if(rs.next()) client.setId(rs.getInt(1));
         }
     }
-    public static String insertClientService(String firstname, String lastname, String patronymic, String title, String comment) throws SQLException {
-        try (Connection c = ClientConnection.getConnection()) {
-            String sql = "Select ID from Client where firstname = ? and  lastname = ? and  patronymic = ?";
+
+    public static List<Client> getClients() throws SQLException {
+        try(Connection c = MySqlConnection.getConnection()) {
+            String sql ="select * from Client";
+            Statement s = c.createStatement();
+            ResultSet resultSet = s.executeQuery(sql);
+            List<Client> clients = new ArrayList<>();
+            while (resultSet.next()){
+                clients.add(new Client(
+                        resultSet.getInt(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getString(4),
+                        resultSet.getDate(5),
+                        resultSet.getDate(6),
+                        resultSet.getString(7),
+                        resultSet.getString(8),
+                        resultSet.getString(9),
+                        resultSet.getString(10)
+                ));
+            }
+            return clients;
+        }
+    }
+
+    public static void updateClient(Client client) throws SQLException {
+        try(Connection c = MySqlConnection.getConnection()) {
+            String sql = "update Client set FirstName=?, LastName=?, Patronymic=?, Birthday=?, RegistrationDate=?, Email=?, Phone=?, GenderCode=?, PhotoPath=? where ID=?";
             PreparedStatement ps = c.prepareStatement(sql);
-            ps.setString(1, firstname);
-            ps.setString(2, lastname);
-            ps.setString(3, patronymic);
-            ResultSet resultSet = ps.executeQuery();
-            if(!resultSet.next()) return "Запись клиента не существует";
-            int ClientID = resultSet.getInt("ID");
-            sql = "Select ID from Service where title = ?" ;
-            ps = c.prepareStatement(sql);
-            ps.setString(1, title);
-            resultSet = ps.executeQuery();
-            if(!resultSet.next()) return "Услуги не существует";
-            int ServiceID = resultSet.getInt("ID");
-            sql = "INSERT INTO ClientService(ClientID, ServiceID, StartTime, Comment) VALUES (?,?,?,?)";
-            ps = c.prepareStatement(sql);
-            ps.setInt(1, ClientID);
-            ps.setInt(2, ServiceID);
-            ps.setTimestamp(3, new Timestamp(new Date().getTime()));
-            ps.setString(4, comment);
+            ps.setString(1, client.getFirstName());
+            ps.setString(2, client.getLastName());
+            ps.setString(3, client.getPatronymic());
+            ps.setTimestamp(4, new Timestamp(client.getBirthday().getTime()));
+            ps.setTimestamp(5, new Timestamp(client.getRegistrationDate().getTime()));
+            ps.setString(6, client.getEmail());
+            ps.setString(7, client.getPhone());
+            ps.setString(8, client.getGenderCode());
+            ps.setString(9, client.getPhotoPath());
+            ps.setInt(10, client.getId());
             ps.executeUpdate();
-            return "Запись создана";
+        }
+    }
+
+    public static void deleteClient(int id) throws SQLException {
+        try(Connection c = MySqlConnection.getConnection()) {
+            String sql = "delete from Client where ID=?";
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setInt(1, id);
+            ps.executeUpdate();
         }
     }
 }
