@@ -15,15 +15,14 @@ public class App {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+       try {
+           UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+       } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+           e.printStackTrace();
+       }
+       changeKeys(new Font("Ubuntu", Font.PLAIN, 12));
 
-        changeAllFonts(new FontUIResource("Ubuntu", Font.TRUETYPE_FONT, 12));
-
-       // new ClientTableUI();
+        // new ClientTableUI();
         new ClientTableForm();
 //        Random random = new Random();
 //        int[] list = new int[10];
@@ -36,7 +35,39 @@ public class App {
 //        for (int i=0; i<10; i++) {
 //            System.out.print(list[i] + " ");
 //        }
+        
     }
+    
+    
+    
+    public static void changeKeys(Font font){
+        Enumeration<Object> keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()){
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if(value instanceof javax.swing.plaf.FontUIResource) {
+                UIManager.put(key, font);
+            }
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
 
     public static void changeAllFonts(Font font) {
         Enumeration<Object> keys = UIManager.getDefaults().keys();

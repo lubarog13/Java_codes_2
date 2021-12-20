@@ -3,6 +3,7 @@ package lubarog13.ui;
 import lubarog13.Entetys.Client;
 import lubarog13.ExtendedTableModelWithDocs;
 import lubarog13.base.BaseForm;
+import lubarog13.base.BaseFormTrain;
 import lubarog13.manager.ClientManager;
 import lubarog13.util.DialogUtil;
 
@@ -14,7 +15,7 @@ import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.*;
 
-public class ClientTableForm extends BaseForm {
+public class ClientTableForm extends BaseFormTrain {
     private JPanel mainPanel;
     private JTable table1;
     private JButton createButton;

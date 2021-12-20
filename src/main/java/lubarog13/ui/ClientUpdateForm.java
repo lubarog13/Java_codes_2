@@ -2,6 +2,7 @@ package lubarog13.ui;
 
 import lubarog13.Entetys.Client;
 import lubarog13.base.BaseForm;
+import lubarog13.base.BaseFormTrain;
 import lubarog13.manager.ClientManager;
 import lubarog13.util.DialogUtil;
 
@@ -10,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 
-public class ClientUpdateForm extends BaseForm {
+public class ClientUpdateForm extends BaseFormTrain {
     private JPanel mainPanel;
     private JTextField lnameField;
     private JTextField fnameField;

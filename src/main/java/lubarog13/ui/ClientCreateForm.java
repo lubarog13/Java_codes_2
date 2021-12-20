@@ -2,6 +2,7 @@ package lubarog13.ui;
 
 import lubarog13.Entetys.Client;
 import lubarog13.base.BaseForm;
+import lubarog13.base.BaseFormTrain;
 import lubarog13.manager.ClientManager;
 import lubarog13.util.DialogUtil;
 
@@ -12,7 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-public class ClientCreateForm extends BaseForm {
+public class ClientCreateForm extends BaseFormTrain {
     private JPanel mainPanel;
     private JTextField lnameField;
     private JTextField fnameField;
